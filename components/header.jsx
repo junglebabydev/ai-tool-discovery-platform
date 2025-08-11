@@ -4,19 +4,7 @@ import { useState } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ChevronDown } from "lucide-react"
-
-const categories = [
-  "Writing & Content",
-  "Image & Design",
-  "Developer Tools",
-  "Business & Finance",
-  "Marketing & SEO",
-  "Data & Analytics",
-  "Audio & Music",
-  "Video & Animation",
-  "Productivity",
-  "Education & Learning",
-]
+import { categories } from "@/lib/data"
 
 export default function Header() {
   const [showDropdown, setShowDropdown] = useState(false)
@@ -56,11 +44,11 @@ export default function Header() {
                 <div className="absolute top-full left-0 mt-1 w-64 bg-white rounded-md shadow-lg border border-gray-200 py-2 z-50">
                   {categories.map((category) => (
                     <Link
-                      key={category}
-                      href={`/categories?category=${encodeURIComponent(category)}`}
+                      key={category.id}
+                      href={`/categories?category=${category.id}`}
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900"
                     >
-                      {category}
+                      {category.name}
                     </Link>
                   ))}
                   <div className="border-t border-gray-100 mt-2 pt-2">
