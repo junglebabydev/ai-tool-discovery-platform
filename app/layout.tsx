@@ -1,12 +1,58 @@
-import type { Metadata } from 'next'
-import { GeistSans } from 'geist/font/sans'
-import { GeistMono } from 'geist/font/mono'
-import './globals.css'
+import type React from "react"
+import type { Metadata } from "next"
+import { GeistSans } from "geist/font/sans"
+import { GeistMono } from "geist/font/mono"
+import "./globals.css"
 
 export const metadata: Metadata = {
-  title: 'v0 App',
-  description: 'Created with v0',
-  generator: 'v0.dev',
+  title: "obase - Discover the Best AI Tools & Agents",
+  description:
+    "Find, compare, and choose from thousands of AI-powered tools and agents to supercharge your workflow and boost productivity. Discover curated AI stacks for every use case.",
+  keywords:
+    "AI tools, AI agents, artificial intelligence, productivity tools, AI marketplace, machine learning tools, automation, AI software",
+  authors: [{ name: "obase" }],
+  creator: "obase",
+  publisher: "obase",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  metadataBase: new URL("https://obase.dev"),
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: "obase - Discover the Best AI Tools & Agents",
+    description:
+      "Find, compare, and choose from thousands of AI-powered tools and agents to supercharge your workflow and boost productivity.",
+    url: "https://obase.dev",
+    siteName: "obase",
+    type: "website",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "obase - Discover the Best AI Tools & Agents",
+    description:
+      "Find, compare, and choose from thousands of AI-powered tools and agents to supercharge your workflow and boost productivity.",
+    creator: "@obase",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  verification: {
+    google: "your-google-verification-code",
+  },
+    generator: 'v0.dev'
 }
 
 export default function RootLayout({
