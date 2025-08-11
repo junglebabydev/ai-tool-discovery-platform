@@ -74,8 +74,47 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Recommended AI Stacks */}
+      {/* Browse by Category */}
       <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Browse by Category</h2>
+            <p className="text-lg text-gray-600">Explore AI tools organized by functionality and use case</p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            {browseCategoriesData.map((category) => (
+              <Link key={category.id} href={`/categories?category=${category.id}`}>
+                <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center text-2xl">
+                          {category.icon}
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-lg text-gray-900">{category.name}</h3>
+                          <p className="text-sm text-gray-500">{category.count} tools available</p>
+                        </div>
+                      </div>
+                      <ArrowRight className="w-5 h-5 text-gray-400" />
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
+
+          <div className="text-center">
+            <Button variant="outline" size="lg">
+              View All Categories
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Recommended AI Stacks */}
+      <section className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Recommended AI Stacks</h2>
@@ -269,45 +308,6 @@ export default function HomePage() {
                 </CardContent>
               </Card>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Browse by Category */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Browse by Category</h2>
-            <p className="text-lg text-gray-600">Explore AI tools organized by functionality and use case</p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            {browseCategoriesData.map((category) => (
-              <Link key={category.id} href={`/categories?category=${category.id}`}>
-                <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center text-2xl">
-                          {category.icon}
-                        </div>
-                        <div>
-                          <h3 className="font-semibold text-lg text-gray-900">{category.name}</h3>
-                          <p className="text-sm text-gray-500">{category.count} tools available</p>
-                        </div>
-                      </div>
-                      <ArrowRight className="w-5 h-5 text-gray-400" />
-                    </div>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
-          </div>
-
-          <div className="text-center">
-            <Button variant="outline" size="lg">
-              View All Categories
-            </Button>
           </div>
         </div>
       </section>
