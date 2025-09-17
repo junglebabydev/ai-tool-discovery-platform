@@ -1,31 +1,31 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { ChevronDown } from "lucide-react"
-import { supabase } from "@/lib/supabase"
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { ChevronDown } from "lucide-react";
+import { supabase } from "@/lib/supabase";
 
 export default function Header() {
-  const [showDropdown, setShowDropdown] = useState(false)
-  const [dbCategories, setDbCategories] = useState([])
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [dbCategories, setDbCategories] = useState([]);
 
   useEffect(() => {
     const fetchCategories = async () => {
       const { data, error } = await supabase
-        .from('categories_final')
-        .select('id, name, slug')
-        .order('name', { ascending: true })
+        .from("categories")
+        .select("id, name, slug")
+        .order("name", { ascending: true });
 
       if (!error && data) {
-        setDbCategories(data)
+        setDbCategories(data);
       } else {
-        console.error('Error fetching categories:', error)
+        console.error("Error fetching categories:", error);
       }
-    }
+    };
 
-    fetchCategories()
-  }, [])
+    fetchCategories();
+  }, []);
 
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
@@ -43,7 +43,10 @@ export default function Header() {
 
           {/* Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <Link href="/" className="text-gray-700 hover:text-gray-900 font-medium">
+            <Link
+              href="/"
+              className="text-gray-700 hover:text-gray-900 font-medium"
+            >
               Home
             </Link>
 
@@ -81,7 +84,10 @@ export default function Header() {
               )}
             </div>
 
-            <Link href="/submit-tool" className="text-gray-700 hover:text-gray-900 font-medium">
+            <Link
+              href="/submit-tool"
+              className="text-gray-700 hover:text-gray-900 font-medium"
+            >
               Submit Tool
             </Link>
 
@@ -99,5 +105,5 @@ export default function Header() {
         </div>
       </div>
     </header>
-  )
+  );
 }

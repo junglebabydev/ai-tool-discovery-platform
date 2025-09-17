@@ -1,62 +1,84 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase'
-import { Card, CardContent } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+import { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 // Company icons removed as company name is no longer displayed
-import Link from 'next/link'
+import Link from "next/link";
 
-export default function FeaturedProducts({ showRating = true, gridCols = 3, showAll = false, selectedCategories = [], selectedTags = [], searchQuery = "" }) {
-  const [products, setProducts] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+export default function FeaturedProducts({
+  showRating = true,
+  gridCols = 3,
+  showAll = false,
+  selectedCategories = [],
+  selectedTags = [],
+  searchQuery = "",
+}) {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetchAllProducts()
-  }, [])
+    fetchAllProducts();
+  }, []);
 
   const fetchAllProducts = async () => {
     try {
-      setLoading(true)
-      setError(null)
+      setLoading(true);
+      setError(null);
 
-
+      // Check if Supabase is properly configured
+      if (
+        !process.env.NEXT_PUBLIC_SUPABASE_URL ||
+        !process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY
+      ) {
+        throw new Error(
+          "Supabase environment variables are not configured. Please check your .env.local file."
+        );
+      }
 
       // Fetch all products from Supabase
       const { data, error } = await supabase
-        .from('products')
-        .select(`
+        .from("products")
+        .select(
+          `
           *,
           company:companies(name, slug, website_url, logo_url, verified),
-          product_categories:product_categories_final(
-            category:categories_final(id, name, slug)
+          product_categories:product_category_jnc(
+            category:categories!product_category_jnc_category_id_fkey(id, name, slug)
           ),
-          product_tags:product_tags(
-            tag:tags(id, name, slug)
+          product_tags:product_tags_jnc(
+            tag:tags!product_tags_jnc_tag_id_fkey(id, name, slug)
           )
-        `)
-        .order('created_at', { ascending: false })
+        `
+        )
+        .order("created_at", { ascending: false });
 
       if (error) {
-        console.error('Error fetching products:', error)
-        setError(error.message)
-        return
+        console.error("Supabase error fetching products:", error);
+        setError(`Database error: ${error.message}`);
+        return;
       }
 
-      setProducts(data || [])
+      console.log("Successfully fetched products:", data?.length || 0);
+      setProducts(data || []);
     } catch (err) {
-      console.error('Error:', err)
-      setError(err.message)
+      console.error("Error fetching products:", err);
+      setError(err.message);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   if (loading) {
     return (
-      <div className={`grid sm:grid-cols-2 ${gridCols === 2 ? 'md:grid-cols-2' : 'md:grid-cols-3'} gap-6`}>
+      <div
+        className={`grid sm:grid-cols-2 ${
+          gridCols === 2 ? "md:grid-cols-2" : "md:grid-cols-3"
+        } gap-6`}
+      >
         {[...Array(12)].map((_, i) => (
           <Card key={i} className="animate-pulse h-[440px]">
             <div className="aspect-video bg-gray-200 rounded-t-lg"></div>
@@ -69,207 +91,256 @@ export default function FeaturedProducts({ showRating = true, gridCols = 3, show
           </Card>
         ))}
       </div>
-    )
+    );
   }
 
   if (error) {
     return (
       <div className="text-center py-8">
-        <div className="bg-red-50 border border-red-200 rounded-md p-4">
-          <p className="text-red-700">Error loading products: {error}</p>
-          <button 
+        <div className="bg-red-50 border border-red-200 rounded-md p-4 max-w-2xl mx-auto">
+          <h3 className="text-red-800 font-semibold mb-2">
+            Error loading products
+          </h3>
+          <p className="text-red-700 mb-4">{error}</p>
+          {error.includes("environment variables") && (
+            <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3 mb-4 text-left">
+              <p className="text-yellow-800 text-sm">
+                <strong>Setup required:</strong> Create a{" "}
+                <code>.env.local</code> file in your project root with:
+              </p>
+              <pre className="text-xs text-yellow-700 mt-2 bg-yellow-100 p-2 rounded">
+                {`NEXT_PUBLIC_SUPABASE_URL=your_supabase_url_here
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=your_supabase_anon_key_here`}
+              </pre>
+            </div>
+          )}
+          <button
             onClick={fetchAllProducts}
-            className="mt-2 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+            className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
           >
             Try Again
           </button>
         </div>
       </div>
-    )
+    );
   }
 
   if (products.length === 0) {
     return (
       <div className="text-center py-8">
-        <p className="text-gray-500">No products found. Please check your database.</p>
+        <p className="text-gray-500">
+          No products found. Please check your database.
+        </p>
       </div>
-    )
+    );
   }
 
   // Filter products based on selected categories, tags, and search query
-  const filteredProducts = products.filter(product => {
+  const filteredProducts = products.filter((product) => {
     // Filter by search query if provided
     if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase().trim()
-      const productName = product.name?.toLowerCase() || ""
-      const productDescription = product.description?.toLowerCase() || ""
-      const productTagline = product.tagline?.toLowerCase() || ""
-      const productCategory = product.category?.name?.toLowerCase() || ""
+      const query = searchQuery.toLowerCase().trim();
+      const productName = product.name?.toLowerCase() || "";
+      const productDescription = product.description?.toLowerCase() || "";
+      const productTagline = product.tagline?.toLowerCase() || "";
+      const productCategory = product.category?.name?.toLowerCase() || "";
       const productCategoryList = (product.product_categories || [])
-        .map(pc => pc.category?.name?.toLowerCase())
-        .filter(Boolean)
-      const productTags = product.tags?.map(tag => tag.toLowerCase()) || []
-      
-      const hasMatch = 
+        .map((pc) => pc.category?.name?.toLowerCase())
+        .filter(Boolean);
+      const productTags = product.tags?.map((tag) => tag.toLowerCase()) || [];
+
+      const hasMatch =
         productName.includes(query) ||
         productDescription.includes(query) ||
         productTagline.includes(query) ||
         productCategory.includes(query) ||
-        productCategoryList.some(c => c.includes(query)) ||
-        productTags.some(tag => tag.includes(query))
-      
+        productCategoryList.some((c) => c.includes(query)) ||
+        productTags.some((tag) => tag.includes(query));
+
       if (!hasMatch) {
-        return false
+        return false;
       }
     }
-    
+
     // Filter by categories if any are selected
     if (selectedCategories.length > 0) {
       const candidateValues = [
         product.category?.name,
         product.category?.slug,
-        ...(product.product_categories || []).flatMap(pc => [pc.category?.name, pc.category?.slug])
+        ...(product.product_categories || []).flatMap((pc) => [
+          pc.category?.name,
+          pc.category?.slug,
+        ]),
       ]
         .filter(Boolean)
-        .map(v => String(v).toLowerCase())
+        .map((v) => String(v).toLowerCase());
 
-      const selectedLower = selectedCategories.map(v => String(v).toLowerCase())
-      const matchesAny = candidateValues.some(v => selectedLower.includes(v))
-      if (!matchesAny) return false
+      const selectedLower = selectedCategories.map((v) =>
+        String(v).toLowerCase()
+      );
+      const matchesAny = candidateValues.some((v) => selectedLower.includes(v));
+      if (!matchesAny) return false;
     }
-    
+
     // Filter by tags if any are selected
     if (selectedTags.length > 0) {
       const productTagNames = [
         ...(Array.isArray(product.tags) ? product.tags : []),
-        ...((product.product_tags || []).map(pt => pt?.tag?.name).filter(Boolean))
-      ].map(t => String(t).toLowerCase())
+        ...(product.product_tags || [])
+          .map((pt) => pt?.tag?.name)
+          .filter(Boolean),
+      ].map((t) => String(t).toLowerCase());
 
       if (productTagNames.length === 0) {
-        return false
+        return false;
       }
 
-      const selectedLower = selectedTags.map(t => String(t).toLowerCase())
-      const hasMatchingTag = selectedLower.some(tag => productTagNames.includes(tag))
+      const selectedLower = selectedTags.map((t) => String(t).toLowerCase());
+      const hasMatchingTag = selectedLower.some((tag) =>
+        productTagNames.includes(tag)
+      );
       if (!hasMatchingTag) {
-        return false
+        return false;
       }
     }
-    
-    return true
-  })
+
+    return true;
+  });
 
   return (
     <>
-      <div className={`grid sm:grid-cols-2 ${gridCols === 2 ? 'md:grid-cols-2' : 'md:grid-cols-3'} gap-6`}>
-        {(showAll ? filteredProducts : filteredProducts.slice(0, 6)).map((product) => (
-        <Card key={product.id} className="hover:shadow-lg transition-shadow overflow-hidden h-[440px] flex flex-col">
-          {/* Product Image */}
-          <div className="aspect-video bg-gradient-to-br from-purple-900 via-blue-900 to-purple-800 rounded-t-lg relative overflow-hidden">
-            {product.banner_url ? (
-              <img
-                src={product.banner_url}
-                alt={product.name}
-                className="w-full h-full object-cover opacity-80"
-              />
-            ) : (
-              <div className="w-full h-full" />
-            )}
-
-            {/* Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-br from-purple-900/50 via-blue-900/50 to-purple-800/50"></div>
-
-            {/* Centered logo/icon from tool_thumbnail_url */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              {product.tool_thumbnail_url ? (
-                <div className="rounded-md bg-white/90 p-2 shadow-md">
+      <div
+        className={`grid sm:grid-cols-2 ${
+          gridCols === 2 ? "md:grid-cols-2" : "md:grid-cols-3"
+        } gap-6`}
+      >
+        {(showAll ? filteredProducts : filteredProducts.slice(0, 6)).map(
+          (product) => (
+            <Card
+              key={product.id}
+              className="hover:shadow-lg transition-shadow overflow-hidden h-[440px] flex flex-col"
+            >
+              {/* Product Image - Fixed height */}
+              <div className="h-32 bg-gradient-to-br from-purple-900 via-blue-900 to-purple-800 rounded-t-lg relative overflow-hidden">
+                {product.banner_url ? (
                   <img
-                    src={product.tool_thumbnail_url}
-                    alt={`${product.name} logo`}
-                    className="max-h-14 max-w-[160px] object-contain"
+                    src={product.banner_url}
+                    alt={product.name}
+                    className="w-full h-full object-cover opacity-80"
                   />
+                ) : (
+                  <div className="w-full h-full" />
+                )}
+
+                {/* Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-900/50 via-blue-900/50 to-purple-800/50"></div>
+
+                {/* Centered logo/icon from tool_thumbnail_url */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  {product.tool_thumbnail_url ? (
+                    <div className="rounded-md bg-white/90 p-2 shadow-md">
+                      <img
+                        src={product.tool_thumbnail_url}
+                        alt={`${product.name} logo`}
+                        className="max-h-14 max-w-[160px] object-contain"
+                      />
+                    </div>
+                  ) : (
+                    <div className="text-4xl text-white">🚀</div>
+                  )}
                 </div>
-              ) : (
-                <div className="text-4xl text-white">🚀</div>
-              )}
-            </div>
-          </div>
-          
-          <CardContent className="p-6 flex flex-col flex-1">
-            {/* Company Info removed above product name */}
-            
-            {/* Product Name */}
-            <h3 className="font-semibold text-lg mb-2 line-clamp-2">{product.name}</h3>
-            
-            {/* Tagline */}
-            {product.tagline && (
-              <p className="text-sm text-gray-600 mb-3 line-clamp-2">
-                {product.tagline}
-              </p>
-            )}
-            
-            {/* Categories as pills */}
-            <div className="flex flex-wrap gap-2 mb-3">
-              {(() => {
-                const names = [
-                  product?.category?.name,
-                  ...(product?.product_categories || [])
-                    .map(pc => pc?.category?.name)
-                    .filter(Boolean)
-                ].filter(Boolean)
-                if (names.length === 0) {
-                  return (
-                    <Badge variant="secondary" className="text-xs px-3 py-1">Uncategorized</Badge>
-                  )
-                }
-                return names.slice(0, 2).map((name, idx) => (
-                  <Badge key={idx} variant="secondary" className="text-xs px-3 py-1">
-                    {name}
-                  </Badge>
-                ))
-              })()}
-            </div>
-            
+              </div>
 
-            
-            {/* Tags */}
-            <div className="flex flex-wrap gap-2 mb-4">
-              {(() => {
-                const tagNames = [
-                  ...(product?.tags || []), // legacy array of strings
-                  ...((product?.product_tags || [])
-                    .map(pt => pt?.tag?.name)
-                    .filter(Boolean))
-                ]
-                  .filter(Boolean)
-                  .slice(0, 4)
+              <CardContent className="p-6 flex flex-col flex-1 min-h-0">
+                {/* Product Name - Fixed height */}
+                <h3 className="font-semibold text-lg mb-2 line-clamp-2 h-12 flex items-center">
+                  {product.name}
+                </h3>
 
-                return tagNames.map((tag, index) => (
-                  <Badge
-                    key={`${tag}-${index}`}
-                    variant="secondary"
-                    className="text-xs px-3 py-1 min-w-[80px] justify-center truncate"
+                {/* Tagline - Fixed height */}
+                <div className="h-10 mb-3">
+                  {product.tagline && (
+                    <p className="text-sm text-gray-600 line-clamp-2">
+                      {product.tagline}
+                    </p>
+                  )}
+                </div>
+
+                {/* Categories as pills - Fixed height */}
+                <div className="h-8 mb-3 flex flex-wrap gap-2 overflow-hidden">
+                  {(() => {
+                    const names = [
+                      product?.category?.name,
+                      ...(product?.product_categories || [])
+                        .map((pc) => pc?.category?.name)
+                        .filter(Boolean),
+                    ].filter(Boolean);
+                    if (names.length === 0) {
+                      return (
+                        <Badge
+                          variant="secondary"
+                          className="text-xs px-3 py-1"
+                        >
+                          Uncategorized
+                        </Badge>
+                      );
+                    }
+                    return names.slice(0, 2).map((name, idx) => (
+                      <Badge
+                        key={idx}
+                        variant="secondary"
+                        className="text-xs px-3 py-1"
+                      >
+                        {name}
+                      </Badge>
+                    ));
+                  })()}
+                </div>
+
+                {/* Tags - Scrollable section with fixed height */}
+                <div className="flex-1 min-h-0 mb-4">
+                  <div className="h-20 overflow-y-auto scrollbar-hide">
+                    <div className="flex flex-wrap gap-2">
+                      {(() => {
+                        const tagNames = [
+                          ...(product?.tags || []), // legacy array of strings
+                          ...(product?.product_tags || [])
+                            .map((pt) => pt?.tag?.name)
+                            .filter(Boolean),
+                        ]
+                          .filter(Boolean)
+                          .slice(0, 8); // Show more tags since we have scroll
+
+                        return tagNames.map((tag, index) => (
+                          <Badge
+                            key={`${tag}-${index}`}
+                            variant="secondary"
+                            className="text-xs px-3 py-1 min-w-[80px] justify-center truncate"
+                          >
+                            #{tag}
+                          </Badge>
+                        ));
+                      })()}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Action Button - Fixed at bottom */}
+                <div className="mt-auto">
+                  <Link
+                    href={`/tool/${product.slug || product.id}`}
+                    className="block"
                   >
-                    #{tag}
-                  </Badge>
-                ))
-              })()}
-            </div>
-            
-            {/* Action Button */}
-            <div className="mt-2">
-              <Link href={`/tool/${product.slug || product.id}`} className="block">
-                <Button size="sm" className="w-full">
-                  View tool
-                </Button>
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
-      ))}
+                    <Button size="sm" className="w-full">
+                      View tool
+                    </Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
+          )
+        )}
       </div>
-      
-
     </>
-  )
+  );
 }

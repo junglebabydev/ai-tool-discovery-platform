@@ -1,16 +1,16 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { useParams } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
-import Header from "@/components/header"
-import Link from "next/link"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import ShareModal from "@/components/ui/share-modal"
-import ReportModal from "@/components/ui/report-modal"
+import { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
+import { supabase } from "@/lib/supabase";
+import Header from "@/components/header";
+import Link from "next/link";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import ShareModal from "@/components/ui/share-modal";
+import ReportModal from "@/components/ui/report-modal";
 import {
   Star,
   ExternalLink,
@@ -26,12 +26,10 @@ import {
   MessageSquare,
   ThumbsUp,
   User,
-} from "lucide-react"
-import { notFound } from "next/navigation"
+} from "lucide-react";
+import { notFound } from "next/navigation";
 
 // Trending products are fetched dynamically by IDs
-
-
 
 const getCategoryImage = (category) => {
   const categoryImages = {
@@ -41,9 +39,9 @@ const getCategoryImage = (category) => {
     "Marketing & SEO": "/futuristic-ai-interface.png",
     "Image Generation": "/futuristic-ai-interface.png",
     "Chatbots & Automation": "/futuristic-ai-interface.png",
-  }
-  return categoryImages[category] || "/futuristic-ai-interface.png"
-}
+  };
+  return categoryImages[category] || "/futuristic-ai-interface.png";
+};
 
 const sampleReviews = [
   {
@@ -76,7 +74,7 @@ const sampleReviews = [
       "Outstanding quality and speed. I've tried many similar tools but this one stands out for its accuracy and ease of use. Highly recommended!",
     helpful: 15,
   },
-]
+];
 
 const socialFeeds = [
   {
@@ -113,7 +111,7 @@ const socialFeeds = [
       },
     ],
   },
-]
+];
 
 const teamMembers = [
   {
@@ -137,127 +135,133 @@ const teamMembers = [
     bio: "Product strategist with experience at Notion and Figma. Passionate about user-centric AI design.",
     linkedin: "#",
   },
-]
+];
 
 export default function ToolDetailPage() {
-  const params = useParams()
-  const [product, setProduct] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const [showShareModal, setShowShareModal] = useState(false)
-  const [showReportModal, setShowReportModal] = useState(false)
-  const [activeSocialPlatform, setActiveSocialPlatform] = useState('x')
+  const params = useParams();
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [activeSocialPlatform, setActiveSocialPlatform] = useState("x");
   const [latestNews, setLatestNews] = useState([
     { title: "New AI Writing Features Released", date: "2 days ago" },
     { title: "Platform Security Update", date: "1 week ago" },
     { title: "Community Milestone: 50K Users", date: "2 weeks ago" },
-  ])
-  const [trendingProducts, setTrendingProducts] = useState([])
+  ]);
+  const [trendingProducts, setTrendingProducts] = useState([]);
 
   useEffect(() => {
     if (params?.slug) {
-      fetchProduct()
+      fetchProduct();
     }
-  }, [params?.slug])
+  }, [params?.slug]);
 
   useEffect(() => {
-    fetchAINews()
-  }, [])
+    fetchAINews();
+  }, []);
 
   // Fetch trending products by specific IDs
   useEffect(() => {
     const fetchTrending = async () => {
-      const trendingIds = [13, 14, 15]
+      const trendingIds = [13, 14, 15];
       try {
         const { data, error } = await supabase
-          .from('products')
-          .select(`
+          .from("products")
+          .select(
+            `
             id, name, slug, tagline,
-            product_categories:product_categories(
-              category:categories(name)
+            product_categories:product_category_jnc(
+              category:categories!product_category_jnc_category_id_fkey(name)
             )
-          `)
-          .in('id', trendingIds)
+          `
+          )
+          .in("id", trendingIds);
 
         if (!error && data) {
-          const ordered = [...data].sort((a, b) => trendingIds.indexOf(a.id) - trendingIds.indexOf(b.id))
-          setTrendingProducts(ordered)
+          const ordered = [...data].sort(
+            (a, b) => trendingIds.indexOf(a.id) - trendingIds.indexOf(b.id)
+          );
+          setTrendingProducts(ordered);
         } else if (error) {
-          console.error('Error fetching trending products:', error)
+          console.error("Error fetching trending products:", error);
         }
       } catch (err) {
-        console.error('Error fetching trending products:', err)
+        console.error("Error fetching trending products:", err);
       }
-    }
+    };
 
-    fetchTrending()
-  }, [])
+    fetchTrending();
+  }, []);
 
   const fetchAINews = async () => {
     try {
-      const response = await fetch('/api/fetch-ai-news')
+      const response = await fetch("/api/fetch-ai-news");
       if (response.ok) {
-        const data = await response.json()
+        const data = await response.json();
         if (data.success && data.news) {
-          setLatestNews(data.news.slice(0, 3)) // Show only 3 latest news items
+          setLatestNews(data.news.slice(0, 3)); // Show only 3 latest news items
         }
       }
     } catch (error) {
-      console.error('Failed to fetch AI news:', error)
+      console.error("Failed to fetch AI news:", error);
       // Keep the default news if API fails
     }
-  }
+  };
 
   const fetchProduct = async () => {
     try {
-      setLoading(true)
-      setError(null)
+      setLoading(true);
+      setError(null);
 
       // Try to find by slug first, then by ID if slug doesn't work
       let { data, error } = await supabase
-        .from('products')
-        .select(`
+        .from("products")
+        .select(
+          `
           *,
           company:companies(name, slug, website_url, logo_url, verified, team_size, funding_round, funding_amount, funding_info),
-          category:categories_final(name, slug)
-        `)
-        .eq('slug', params.slug)
-        .single()
+          category:categories(name, slug)
+        `
+        )
+        .eq("slug", params.slug)
+        .single();
 
       // If not found by slug, try by ID (in case the URL contains a numeric ID)
       if (error && !isNaN(params.slug)) {
         const { data: idData, error: idError } = await supabase
-          .from('products')
-          .select(`
+          .from("products")
+          .select(
+            `
             *,
             company:companies(name, slug, website_url, logo_url, verified, team_size, funding_round, funding_amount, funding_info),
-            category:categories_final(name, slug)
-          `)
-          .eq('id', parseInt(params.slug))
-          .single()
-        
+            category:categories(name, slug)
+          `
+          )
+          .eq("id", parseInt(params.slug))
+          .single();
+
         if (!idError) {
-          data = idData
-          error = null
+          data = idData;
+          error = null;
         }
       }
 
       if (error) {
-        console.error('Error fetching product:', error)
-        setError(error.message)
-        return
+        console.error("Error fetching product:", error);
+        setError(error.message);
+        return;
       }
 
-      setProduct(data)
+      setProduct(data);
     } catch (err) {
-      console.error('Error:', err)
-      setError(err.message)
+      console.error("Error:", err);
+      setError(err.message);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
-
-
+  };
 
   if (loading) {
     return (
@@ -278,7 +282,7 @@ export default function ToolDetailPage() {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   if (error || !product) {
@@ -288,18 +292,18 @@ export default function ToolDetailPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center">
             <div className="bg-red-50 border border-red-200 rounded-md p-8">
-              <h1 className="text-2xl font-bold text-red-700 mb-4">Tool Not Found</h1>
+              <h1 className="text-2xl font-bold text-red-700 mb-4">
+                Tool Not Found
+              </h1>
               <p className="text-red-600 mb-6">
-                {error || 'The tool you are looking for could not be found.'}
+                {error || "The tool you are looking for could not be found."}
               </p>
-              <Button onClick={() => window.history.back()}>
-                Go Back
-              </Button>
+              <Button onClick={() => window.history.back()}>Go Back</Button>
             </div>
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -319,23 +323,33 @@ export default function ToolDetailPage() {
           <div className="lg:col-span-5">
             <div className="flex items-start justify-between mb-6">
               <div className="flex-1">
-
-                <h1 className="text-3xl font-bold text-gray-900 mb-3">{product.name}</h1>
-                <p className="text-gray-600 text-lg leading-relaxed mb-4">{product.description || 'No description available.'}</p>
+                <h1 className="text-3xl font-bold text-gray-900 mb-3">
+                  {product.name}
+                </h1>
+                <p className="text-gray-600 text-lg leading-relaxed mb-4">
+                  {product.description || "No description available."}
+                </p>
 
                 <div className="flex items-center gap-4 mb-4">
                   <div className="flex items-center gap-2 text-sm text-gray-500">
                     <span>by</span>
                     <span className="text-gray-900 font-medium">
-                      {product.company?.name || 'Unknown Company'}
+                      {product.company?.name || "Unknown Company"}
                     </span>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-3">
                   {product.website_url && (
-                    <a href={product.website_url} target="_blank" rel="noopener noreferrer">
-                      <Button size="lg" className="bg-blue-600 hover:bg-blue-700">
+                    <a
+                      href={product.website_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Button
+                        size="lg"
+                        className="bg-blue-600 hover:bg-blue-700"
+                      >
                         <ExternalLink className="w-4 h-4 mr-2" />
                         Website
                       </Button>
@@ -346,11 +360,19 @@ export default function ToolDetailPage() {
                     <Heart className="w-4 h-4 mr-2" />
                     Save
                   </Button> */}
-                  <Button variant="outline" size="lg" onClick={() => setShowShareModal(true)}>
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    onClick={() => setShowShareModal(true)}
+                  >
                     <Share2 className="w-4 h-4 mr-2" />
                     Share
                   </Button>
-                  <Button variant="outline" size="lg" onClick={() => setShowReportModal(true)}>
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    onClick={() => setShowReportModal(true)}
+                  >
                     <Flag className="w-4 h-4 mr-2" />
                     Report
                   </Button>
@@ -376,11 +398,14 @@ export default function ToolDetailPage() {
                 )}
                 <div className="absolute top-4 left-4">
                   <Badge className="bg-black/50 text-white border-0">
-                    {product.is_verified ? 'Verified' : 'New'}
+                    {product.is_verified ? "Verified" : "New"}
                   </Badge>
                 </div>
                 <div className="absolute bottom-4 right-4">
-                  <Badge variant="secondary" className="bg-white/90 text-gray-900">
+                  <Badge
+                    variant="secondary"
+                    className="bg-white/90 text-gray-900"
+                  >
                     AI
                   </Badge>
                 </div>
@@ -412,171 +437,232 @@ export default function ToolDetailPage() {
                     </TabsTrigger>
                   </TabsList>
 
-
-
                   <TabsContent value="about" className="p-6">
                     <div className="space-y-6">
                       <div>
-                        <h2 className="text-2xl font-bold text-gray-900 mb-4">About {product.company?.name || 'Unknown Company'}</h2>
+                        <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                          About {product.company?.name || "Unknown Company"}
+                        </h2>
                         <p className="text-gray-700 leading-relaxed mb-6">
-                          {product.company?.name || 'This company'} has been at the forefront of AI technology, creating innovative tools that
-                          help businesses and individuals achieve their goals more efficiently. Our commitment to
-                          excellence and user satisfaction drives everything we do.
+                          {product.company?.name || "This company"} has been at
+                          the forefront of AI technology, creating innovative
+                          tools that help businesses and individuals achieve
+                          their goals more efficiently. Our commitment to
+                          excellence and user satisfaction drives everything we
+                          do.
                         </p>
                       </div>
 
-                                             <div className="grid grid-cols-3 gap-4 mb-4">
-                         <div className="flex flex-col items-center text-center p-4 bg-gray-50 rounded-lg">
-                           <Globe className="w-8 h-8 text-blue-600 mb-2" />
-                           <div className="font-semibold text-gray-900 text-sm mb-1">Website</div>
-                           <div className="text-blue-600 text-sm">
-                             {product.company?.website_url ? (
-                               <a href={product.company.website_url} target="_blank" rel="noopener noreferrer" className="hover:underline">
-                                 {product.company.website_url.replace(/^https?:\/\//, '')}
-                               </a>
-                             ) : (
-                               'www.example.com'
-                             )}
-                           </div>
-                         </div>
+                      <div className="grid grid-cols-3 gap-4 mb-4">
+                        <div className="flex flex-col items-center text-center p-4 bg-gray-50 rounded-lg">
+                          <Globe className="w-8 h-8 text-blue-600 mb-2" />
+                          <div className="font-semibold text-gray-900 text-sm mb-1">
+                            Website
+                          </div>
+                          <div className="text-blue-600 text-sm">
+                            {product.company?.website_url ? (
+                              <a
+                                href={product.company.website_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="hover:underline"
+                              >
+                                {product.company.website_url.replace(
+                                  /^https?:\/\//,
+                                  ""
+                                )}
+                              </a>
+                            ) : (
+                              "www.example.com"
+                            )}
+                          </div>
+                        </div>
 
-                         <div className="flex flex-col items-center text-center p-4 bg-gray-50 rounded-lg">
-                           <Calendar className="w-8 h-8 text-blue-600 mb-2" />
-                           <div className="font-semibold text-gray-900 text-sm mb-1">Founded in</div>
-                           <div className="text-gray-600 text-sm">2019</div>
-                         </div>
+                        <div className="flex flex-col items-center text-center p-4 bg-gray-50 rounded-lg">
+                          <Calendar className="w-8 h-8 text-blue-600 mb-2" />
+                          <div className="font-semibold text-gray-900 text-sm mb-1">
+                            Founded in
+                          </div>
+                          <div className="text-gray-600 text-sm">2019</div>
+                        </div>
 
-                         <div className="flex flex-col items-center text-center p-4 bg-gray-50 rounded-lg">
-                           <MapPin className="w-8 h-8 text-blue-600 mb-2" />
-                           <div className="font-semibold text-gray-900 text-sm mb-1">Location</div>
-                           <div className="text-gray-600 text-sm">San Francisco, CA</div>
-                         </div>
-                       </div>
+                        <div className="flex flex-col items-center text-center p-4 bg-gray-50 rounded-lg">
+                          <MapPin className="w-8 h-8 text-blue-600 mb-2" />
+                          <div className="font-semibold text-gray-900 text-sm mb-1">
+                            Location
+                          </div>
+                          <div className="text-gray-600 text-sm">
+                            San Francisco, CA
+                          </div>
+                        </div>
+                      </div>
 
-                       <div className="grid grid-cols-2 gap-4 max-w-md mx-auto">
-                         <div className="flex flex-col items-center text-center p-4 bg-gray-50 rounded-lg">
-                           <Users className="w-8 h-8 text-blue-600 mb-2" />
-                           <div className="font-semibold text-gray-900 text-sm mb-1">Team Size</div>
-                           <div className="text-gray-600 text-sm">{product.company?.team_size || '—'}</div>
-                         </div>
- 
-                         <div className="flex flex-col items-center text-center p-4 bg-gray-50 rounded-lg">
-                           <TrendingUp className="w-8 h-8 text-blue-600 mb-2" />
-                           <div className="font-semibold text-gray-900 text-sm mb-1">Funding</div>
-                           <div className="text-gray-600 text-sm">{(product.company?.funding_round || product.company?.funding_info || '—') + (product.company?.funding_amount ? ` • ${product.company.funding_amount}` : '')}</div>
-                         </div>
-                       </div>
+                      <div className="grid grid-cols-2 gap-4 max-w-md mx-auto">
+                        <div className="flex flex-col items-center text-center p-4 bg-gray-50 rounded-lg">
+                          <Users className="w-8 h-8 text-blue-600 mb-2" />
+                          <div className="font-semibold text-gray-900 text-sm mb-1">
+                            Team Size
+                          </div>
+                          <div className="text-gray-600 text-sm">
+                            {product.company?.team_size || "—"}
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col items-center text-center p-4 bg-gray-50 rounded-lg">
+                          <TrendingUp className="w-8 h-8 text-blue-600 mb-2" />
+                          <div className="font-semibold text-gray-900 text-sm mb-1">
+                            Funding
+                          </div>
+                          <div className="text-gray-600 text-sm">
+                            {(product.company?.funding_round ||
+                              product.company?.funding_info ||
+                              "—") +
+                              (product.company?.funding_amount
+                                ? ` • ${product.company.funding_amount}`
+                                : "")}
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </TabsContent>
 
-                                     <TabsContent value="social-feeds" className="p-6">
-                     <div className="space-y-8">
-                       <div>
-                         <h2 className="text-2xl font-bold text-gray-900 mb-6">Social Feeds</h2>
+                  <TabsContent value="social-feeds" className="p-6">
+                    <div className="space-y-8">
+                      <div>
+                        <h2 className="text-2xl font-bold text-gray-900 mb-6">
+                          Social Feeds
+                        </h2>
 
-                         {/* Platform Pills */}
-                         <div className="flex gap-2 mb-6">
-                           <button
-                             onClick={() => setActiveSocialPlatform('x')}
-                             className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                               activeSocialPlatform === 'x'
-                                 ? 'bg-blue-600 text-white'
-                                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                             }`}
-                           >
-                             X (Twitter)
-                           </button>
-                           <button
-                             onClick={() => setActiveSocialPlatform('linkedin')}
-                             className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                               activeSocialPlatform === 'linkedin'
-                                 ? 'bg-blue-600 text-white'
-                                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                             }`}
-                           >
-                             LinkedIn
-                           </button>
-                         </div>
+                        {/* Platform Pills */}
+                        <div className="flex gap-2 mb-6">
+                          <button
+                            onClick={() => setActiveSocialPlatform("x")}
+                            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                              activeSocialPlatform === "x"
+                                ? "bg-blue-600 text-white"
+                                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                            }`}
+                          >
+                            X (Twitter)
+                          </button>
+                          <button
+                            onClick={() => setActiveSocialPlatform("linkedin")}
+                            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                              activeSocialPlatform === "linkedin"
+                                ? "bg-blue-600 text-white"
+                                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                            }`}
+                          >
+                            LinkedIn
+                          </button>
+                        </div>
 
-                         {/* X (Twitter) Content */}
-                         {activeSocialPlatform === 'x' && (
-                           <div className="space-y-4">
-                             {socialFeeds.find(p => p.platform === 'X (Twitter)')?.posts.map((post, postIndex) => (
-                               <div key={postIndex} className="bg-gray-50 p-4 rounded-lg">
-                                 <div className="flex items-start gap-3">
-                                   <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
-                                     {post.user.charAt(1).toUpperCase()}
-                                   </div>
-                                   <div className="flex-1">
-                                     <div className="flex items-center gap-2 mb-2">
-                                       <span className="font-semibold text-gray-900">{post.user}</span>
-                                       <span className="text-gray-500 text-sm">• {post.time}</span>
-                                     </div>
-                                     <p className="text-gray-700 mb-3">{post.content}</p>
-                                     <div className="flex items-center gap-4 text-sm text-gray-500">
-                                       <div className="flex items-center gap-1">
-                                         <ThumbsUp className="w-4 h-4" />
-                                         <span>{post.likes}</span>
-                                       </div>
-                                       {post.retweets && (
-                                         <div className="flex items-center gap-1">
-                                           <Share2 className="w-4 h-4" />
-                                           <span>{post.retweets}</span>
-                                         </div>
-                                       )}
-                                     </div>
-                                   </div>
-                                 </div>
-                               </div>
-                             ))}
-                           </div>
-                         )}
+                        {/* X (Twitter) Content */}
+                        {activeSocialPlatform === "x" && (
+                          <div className="space-y-4">
+                            {socialFeeds
+                              .find((p) => p.platform === "X (Twitter)")
+                              ?.posts.map((post, postIndex) => (
+                                <div
+                                  key={postIndex}
+                                  className="bg-gray-50 p-4 rounded-lg"
+                                >
+                                  <div className="flex items-start gap-3">
+                                    <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                                      {post.user.charAt(1).toUpperCase()}
+                                    </div>
+                                    <div className="flex-1">
+                                      <div className="flex items-center gap-2 mb-2">
+                                        <span className="font-semibold text-gray-900">
+                                          {post.user}
+                                        </span>
+                                        <span className="text-gray-500 text-sm">
+                                          • {post.time}
+                                        </span>
+                                      </div>
+                                      <p className="text-gray-700 mb-3">
+                                        {post.content}
+                                      </p>
+                                      <div className="flex items-center gap-4 text-sm text-gray-500">
+                                        <div className="flex items-center gap-1">
+                                          <ThumbsUp className="w-4 h-4" />
+                                          <span>{post.likes}</span>
+                                        </div>
+                                        {post.retweets && (
+                                          <div className="flex items-center gap-1">
+                                            <Share2 className="w-4 h-4" />
+                                            <span>{post.retweets}</span>
+                                          </div>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                          </div>
+                        )}
 
-                         {/* LinkedIn Content */}
-                         {activeSocialPlatform === 'linkedin' && (
-                           <div className="space-y-4">
-                             {socialFeeds.find(p => p.platform === 'LinkedIn')?.posts.map((post, postIndex) => (
-                               <div key={postIndex} className="bg-gray-50 p-4 rounded-lg">
-                                 <div className="flex items-start gap-3">
-                                   <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
-                                     {post.user.charAt(1).toUpperCase()}
-                                   </div>
-                                   <div className="flex-1">
-                                     <div className="flex items-center gap-2 mb-2">
-                                       <span className="font-semibold text-gray-900">{post.user}</span>
-                                       <span className="text-gray-500 text-sm">• {post.time}</span>
-                                     </div>
-                                     <p className="text-gray-700 mb-3">{post.content}</p>
-                                     <div className="flex items-center gap-4 text-sm text-gray-500">
-                                       <div className="flex items-center gap-1">
-                                         <ThumbsUp className="w-4 h-4" />
-                                         <span>{post.likes}</span>
-                                       </div>
-                                       {post.comments && (
-                                         <div className="flex items-center gap-1">
-                                           <MessageSquare className="w-4 h-4" />
-                                           <span>{post.comments}</span>
-                                         </div>
-                                       )}
-                                     </div>
-                                   </div>
-                                 </div>
-                               </div>
-                             ))}
-                           </div>
-                         )}
-                       </div>
-                     </div>
-                   </TabsContent>
+                        {/* LinkedIn Content */}
+                        {activeSocialPlatform === "linkedin" && (
+                          <div className="space-y-4">
+                            {socialFeeds
+                              .find((p) => p.platform === "LinkedIn")
+                              ?.posts.map((post, postIndex) => (
+                                <div
+                                  key={postIndex}
+                                  className="bg-gray-50 p-4 rounded-lg"
+                                >
+                                  <div className="flex items-start gap-3">
+                                    <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                                      {post.user.charAt(1).toUpperCase()}
+                                    </div>
+                                    <div className="flex-1">
+                                      <div className="flex items-center gap-2 mb-2">
+                                        <span className="font-semibold text-gray-900">
+                                          {post.user}
+                                        </span>
+                                        <span className="text-gray-500 text-sm">
+                                          • {post.time}
+                                        </span>
+                                      </div>
+                                      <p className="text-gray-700 mb-3">
+                                        {post.content}
+                                      </p>
+                                      <div className="flex items-center gap-4 text-sm text-gray-500">
+                                        <div className="flex items-center gap-1">
+                                          <ThumbsUp className="w-4 h-4" />
+                                          <span>{post.likes}</span>
+                                        </div>
+                                        {post.comments && (
+                                          <div className="flex items-center gap-1">
+                                            <MessageSquare className="w-4 h-4" />
+                                            <span>{post.comments}</span>
+                                          </div>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </TabsContent>
 
                   <TabsContent value="team" className="p-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                       {teamMembers.map((member, index) => (
-                        <div key={index} className="bg-white border rounded-lg p-6 text-center">
+                        <div
+                          key={index}
+                          className="bg-white border rounded-lg p-6 text-center"
+                        >
                           <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-lg mx-auto mb-4">
                             {member.avatar}
                           </div>
-                          <h3 className="font-semibold text-gray-900 mb-1">{member.name}</h3>
+                          <h3 className="font-semibold text-gray-900 mb-1">
+                            {member.name}
+                          </h3>
                           <p className="text-blue-600 text-sm">{member.role}</p>
                         </div>
                       ))}
@@ -586,8 +672,8 @@ export default function ToolDetailPage() {
               </div>
             </div>
 
-                         {/* Reviews section hidden */}
-             {/* <div className="mt-8">
+            {/* Reviews section hidden */}
+            {/* <div className="mt-8">
                <div className="bg-white rounded-lg shadow-sm border p-6">
                  <div className="flex items-center justify-between mb-6">
                    <h2 className="text-2xl font-bold text-gray-900">Reviews</h2>
@@ -644,10 +730,10 @@ export default function ToolDetailPage() {
               <CardContent className="space-y-4 pt-5">
                 {trendingProducts.map((tp, index) => {
                   const categoryName = (tp.product_categories || [])
-                    .map(pc => pc?.category?.name)
-                    .filter(Boolean)[0]
-                  const subline = tp.tagline || categoryName || '—'
-                  const href = `/tool/${tp.slug || tp.id}`
+                    .map((pc) => pc?.category?.name)
+                    .filter(Boolean)[0];
+                  const subline = tp.tagline || categoryName || "—";
+                  const href = `/tool/${tp.slug || tp.id}`;
                   return (
                     <Link
                       href={href}
@@ -658,11 +744,13 @@ export default function ToolDetailPage() {
                         {index + 1}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-sm text-gray-900 truncate leading-tight mb-1">{tp.name}</p>
+                        <p className="font-semibold text-sm text-gray-900 truncate leading-tight mb-1">
+                          {tp.name}
+                        </p>
                         <p className="text-xs text-gray-600 mb-2">{subline}</p>
                       </div>
                     </Link>
-                  )
+                  );
                 })}
               </CardContent>
             </Card>
@@ -678,12 +766,14 @@ export default function ToolDetailPage() {
                 {latestNews.map((news, index) => (
                   <a
                     key={index}
-                    href={news.url || '#'}
+                    href={news.url || "#"}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="block p-4 rounded-lg hover:bg-green-50 transition-colors border border-transparent hover:border-green-200 hover:shadow-sm"
                   >
-                    <p className="font-semibold text-sm text-gray-900 leading-tight mb-2">{news.title}</p>
+                    <p className="font-semibold text-sm text-gray-900 leading-tight mb-2">
+                      {news.title}
+                    </p>
                     <div className="flex items-center justify-between text-xs text-gray-500">
                       <span className="font-medium">{news.date}</span>
                       {news.source && (
@@ -704,7 +794,7 @@ export default function ToolDetailPage() {
       <ShareModal
         isOpen={showShareModal}
         onClose={() => setShowShareModal(false)}
-        url={typeof window !== 'undefined' ? window.location.href : ''}
+        url={typeof window !== "undefined" ? window.location.href : ""}
         title={product?.name}
         description={product?.description}
       />
@@ -717,5 +807,5 @@ export default function ToolDetailPage() {
         toolId={product?.id}
       />
     </div>
-  )
+  );
 }
