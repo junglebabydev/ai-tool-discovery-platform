@@ -35,7 +35,7 @@ export default function AdminToolsListPage() {
       setLoading(true);
       const { data, error } = await supabase
         .from("products")
-        .select("id, name, slug, tagline, website_url, created_at")
+        .select("id, name, slug, tagline, website_url, tool_thumbnail_url, created_at")
         .order("created_at", { ascending: false });
       if (error) throw error;
       setTools(data || []);
@@ -138,7 +138,20 @@ export default function AdminToolsListPage() {
               .map((tool) => (
                 <Card key={tool.id}>
                   <CardHeader>
-                    <CardTitle className="text-lg">{tool.name}</CardTitle>
+                    <div className="flex items-center gap-3">
+                      {tool.tool_thumbnail_url ? (
+                        <img
+                          src={tool.tool_thumbnail_url}
+                          alt={tool.name}
+                          className="w-12 h-12 rounded-lg object-cover flex-shrink-0"
+                        />
+                      ) : (
+                        <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center text-muted-foreground text-lg font-medium flex-shrink-0">
+                          {tool.name?.charAt(0)?.toUpperCase()}
+                        </div>
+                      )}
+                      <CardTitle className="text-lg">{tool.name}</CardTitle>
+                    </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <p className="text-sm text-muted-foreground line-clamp-2">

@@ -153,6 +153,7 @@ export default function Header() {
             </nav>
 
             {/* Action Buttons */}
+            {/*
             <div className="flex items-center space-x-3">
               {isAdminLoggedIn ? (
                 <div className="flex items-center space-x-3">
@@ -253,6 +254,7 @@ export default function Header() {
                 </Dialog>
               )}
             </div>
+                */}
           </div>
         </div>
       </div>
