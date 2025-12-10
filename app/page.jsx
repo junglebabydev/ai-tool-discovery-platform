@@ -354,12 +354,9 @@ export default function HomePage() {
       <section className="py-20 bg-white border-t border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-3">
+            <h2 className="text-3xl font-bold text-gray-900">
               Browse by Category
             </h2>
-            <p className="text-gray-500">
-              Explore AI tools organized by use case
-            </p>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-8">
@@ -369,23 +366,20 @@ export default function HomePage() {
                 href={`/explore?category=${category.slug || category.id}`}
                 className="block"
               >
-                <div className="group bg-white border border-gray-200 rounded-2xl p-5 hover:shadow-lg hover:border-blue-200 transition-all duration-300 cursor-pointer h-full">
+                <div className="group bg-white border border-gray-200 rounded-2xl p-4 hover:shadow-lg hover:border-blue-200 transition-all duration-300 cursor-pointer aspect-square flex flex-col items-center justify-center text-center">
                   <div
-                    className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 bg-blue-50`}
+                    className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 bg-blue-50`}
                   >
                     <span className="text-blue-600">
                       {getCategoryIcon(category.name)}
                     </span>
                   </div>
-                  <h3 className="font-semibold text-sm text-gray-900 mb-1 group-hover:text-blue-600 transition-colors">
+                  <h3 className="font-semibold text-sm text-gray-900 group-hover:text-blue-600 transition-colors">
                     {category.name}
                   </h3>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-gray-500 mt-1">
                     {categoryCounts[category.id] || 0} tools
                   </p>
-                  <div className="mt-3 flex items-center text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <ArrowRight className="w-4 h-4" />
-                  </div>
                 </div>
               </Link>
             ))}
@@ -420,7 +414,7 @@ export default function HomePage() {
             </Link>
           </div>
 
-          <FeaturedProducts showRating={false} gridCols={3} />
+          <FeaturedProducts showRating={false} gridCols={4} />
         </div>
       </section>
 
@@ -443,23 +437,49 @@ export default function HomePage() {
           </div>
 
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {stacks.map((stack, idx) => {
-              const gradientClass =
-                idx % 3 === 0
-                  ? "bg-gradient-to-br from-orange-100 via-orange-50 to-yellow-50"
-                  : idx % 3 === 1
-                  ? "bg-gradient-to-br from-purple-100 via-purple-50 to-pink-50"
-                  : "bg-gradient-to-br from-blue-100 via-blue-50 to-cyan-50";
-
+            {stacks.map((stack) => {
               const products = (stack.product_stacks || [])
                 .map((ps) => ps.product)
                 .filter(Boolean);
 
+              const displayProducts = products.slice(0, 4);
+              const extraCount = products.length - 4;
+
               return (
                 <Link key={stack.id} href={`/stack/${stack.id}`} className="block group">
-                  <Card className="overflow-hidden border border-gray-200 h-full hover:shadow-lg transition-all duration-300 hover:border-blue-200">
-                    {/* Gradient Header */}
-                    <div className={`h-32 ${gradientClass}`}></div>
+                  <Card className="overflow-hidden border border-gray-200 h-full hover:shadow-lg transition-all duration-300 hover:border-blue-200 rounded-2xl">
+                    {/* Header with Tool Logos */}
+                    <div className="h-36 bg-white flex items-center justify-center px-6 border-b border-gray-100">
+                      <div className="flex items-center gap-3">
+                        {displayProducts.map((product, pIdx) => (
+                          <div 
+                            key={product.id || pIdx}
+                            className="w-12 h-12 rounded-xl overflow-hidden flex items-center justify-center"
+                          >
+                            {product.logo_url || product.tool_thumbnail_url ? (
+                              <img
+                                src={product.logo_url || product.tool_thumbnail_url}
+                                alt={product.name}
+                                className="w-full h-full object-contain"
+                              />
+                            ) : (
+                              <div className="w-full h-full bg-gray-100 flex items-center justify-center rounded-xl">
+                                <span className="text-gray-700 text-sm font-bold">
+                                  {product.name?.charAt(0)?.toUpperCase() || "?"}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                        {extraCount > 0 && (
+                          <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center">
+                            <span className="text-gray-600 text-sm font-semibold">
+                              +{extraCount}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
                     
                     <CardContent className="p-5 bg-white">
                       <h3 className="font-bold text-lg text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">

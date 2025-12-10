@@ -26,7 +26,7 @@ export default function StackActions({ stackId }) {
         onClick={() => setShowShareModal(true)}
       >
         <Share2 className="w-4 h-4" />
-        Share Stack
+        Share
       </Button>
       <Button
         variant={saved ? "default" : "outline"}
@@ -34,7 +34,7 @@ export default function StackActions({ stackId }) {
         onClick={handleSave}
       >
         <Bookmark className={`w-4 h-4 ${saved ? "fill-current" : ""}`} />
-        {saved ? "Saved" : "Save Stack"}
+        {saved ? "Saved" : "Save"}
       </Button>
       <Button
         variant={liked ? "default" : "outline"}
