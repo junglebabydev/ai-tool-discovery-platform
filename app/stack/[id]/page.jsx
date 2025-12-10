@@ -150,9 +150,6 @@ export default async function StackDetailPage({ params }) {
                     Perfect for {stackData.name.toLowerCase()}
                   </span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-600">4.7 average rating</span>
-                </div>
               </div>
 
               <div className="flex gap-3">
@@ -170,29 +167,12 @@ export default async function StackDetailPage({ params }) {
               <h2 className="text-2xl font-bold text-gray-900 mb-4">
                 Stack Overview
               </h2>
-              <p className="text-gray-700 leading-relaxed mb-6">
+              <p className="text-gray-700 leading-relaxed">
                 This curated collection of AI tools and agents is specifically
                 designed for {stackData.name.toLowerCase()}. Each tool has been
                 carefully selected to work together seamlessly, providing you
                 with a comprehensive solution for your workflow needs.
               </p>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="p-4 bg-gray-50 rounded-lg text-center">
-                  <div className="text-2xl font-bold text-gray-900">
-                    {stackProducts.length}
-                  </div>
-                  <div className="text-sm text-gray-600">Tools & Agents</div>
-                </div>
-                <div className="p-4 bg-gray-50 rounded-lg text-center">
-                  <div className="text-2xl font-bold text-gray-900">4.7</div>
-                  <div className="text-sm text-gray-600">Average Rating</div>
-                </div>
-                <div className="p-4 bg-gray-50 rounded-lg text-center">
-                  <div className="text-2xl font-bold text-gray-900">2.5K+</div>
-                  <div className="text-sm text-gray-600">Users</div>
-                </div>
-              </div>
             </div>
 
             {/* Tools in Stack */}
@@ -200,7 +180,7 @@ export default async function StackDetailPage({ params }) {
               <h2 className="text-2xl font-bold text-gray-900 mb-6">
                 Tools & Agents in this Stack
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-3 gap-4">
                 {stackProducts.map((tool) => (
                   <ToolCard key={tool.id} tool={tool} />
                 ))}

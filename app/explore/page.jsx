@@ -181,23 +181,21 @@ export default function ExplorePage() {
     <div className="min-h-screen bg-white">
       <Header />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Page Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Explore</h1>
-          <p className="text-gray-600">
+      {/* Page Header */}
+      <div className="border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 text-center">
+          <h1 className="text-4xl font-bold text-gray-900 mb-3">Explore AI Tools</h1>
+          <p className="text-gray-500 text-lg mb-6">
             Discover AI tools and agents by category
           </p>
-        </div>
-
-        {/* Search Bar */}
-        <div className="mb-8">
-          <div className="flex gap-3 max-w-2xl">
+          
+          {/* Search Bar */}
+          <div className="flex gap-3 max-w-xl mx-auto">
             <div className="relative flex-1">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <Input
-                placeholder="Search for AI tools, agents, or categories..."
-                className="pl-12 pr-12 py-3 text-base border-2 border-gray-200 rounded-full"
+                placeholder="Search for AI tools..."
+                className="pl-12 pr-12 py-3 text-base border border-gray-200 rounded-full bg-gray-50 focus:bg-white"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyPress={handleKeyPress}
@@ -212,155 +210,128 @@ export default function ExplorePage() {
                 </button>
               )}
             </div>
-            <Button className="rounded-full px-6 py-3" onClick={handleSearch}>
+            <Button className="rounded-full px-6" onClick={handleSearch}>
               Search
             </Button>
           </div>
         </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Sidebar Filters */}
-          <div className="lg:w-80 space-y-6">
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-2">
-                    <Filter className="w-5 h-5" />
-                    <h3 className="font-semibold">Filters</h3>
-                  </div>
-                  {(selectedCategories.length > 0 ||
-                    selectedTags.length > 0 ||
-                    searchQuery.trim()) && (
-                    // <Button
-                    //   variant="outline"
-                    //   size="sm"
-                    //   onClick={removeAllFilters}
-                    //   className="flex items-center gap-1 text-gray-600 hover:text-gray-900 hover:bg-gray-50 p-0"
-                    // >
-                    <X
-                      className="w-5 h-5 border border-gray-600 rounded-full hover:bg-gray-50 cursor-pointer"
-                      onClick={removeAllFilters}
-                    />
-                  )}
-                </div>
-
-                {/* Categories Filter */}
-                <div className="mb-6">
-                  <h4 className="font-medium mb-3">Categories</h4>
-                  <div className="space-y-2 max-h-64 overflow-y-auto border border-[#dbdbdb] p-3 rounded-tl-[12px] rounded-bl-[12px]">
-                    {sortedCategories.map((category) => (
-                      <div
-                        key={category.id}
-                        className="flex items-center justify-between"
-                      >
-                        <div className="flex items-center space-x-2">
-                          <Checkbox
-                            id={category.slug}
-                            checked={selectedCategories.includes(category.slug)}
-                            onCheckedChange={(checked) =>
-                              handleCategoryChange(category.slug, checked)
-                            }
-                          />
-                          <label htmlFor={category.slug} className="text-sm">
-                            {category.name}
-                          </label>
-                        </div>
-                        <span className="text-xs text-gray-500">
-                          ({categoryCounts[category.id] || 0})
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Tags Filter */}
-                <div className="mb-6">
-                  <h4 className="font-medium mb-3">Tags</h4>
-                  <div className="space-y-2 max-h-64 overflow-y-auto border border-[#dbdbdb] p-3 rounded-tl-[12px] rounded-bl-[12px]">
-                    {sortedTags.map((tag) => (
-                      <div key={tag} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={`tag-${tag}`}
-                          checked={selectedTags.includes(tag)}
-                          onCheckedChange={(checked) =>
-                            handleTagChange(tag, checked)
-                          }
-                        />
-                        <label htmlFor={`tag-${tag}`} className="text-sm">
-                          #{tag}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Remove Filters Button */}
-                {(selectedCategories.length > 0 || selectedTags.length > 0) && (
-                  <div className="pt-4 border-t border-gray-200">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={removeAllFilters}
-                      className="w-full"
-                    >
-                      Remove All Filters
-                    </Button>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Main Content */}
-          <div className="flex-1">
-            {/* All Tools & Agents */}
-            <div>
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  {selectedCategories.length > 0 ||
-                  selectedTags.length > 0 ||
-                  searchQuery.trim() ? (
-                    <p className="text-sm text-gray-600 mt-1">
-                      {filteredCount === 0
-                        ? "No tools found"
-                        : `Showing ${filteredCount} ${
-                            filteredCount <= 1 ? "tool" : "tools"
-                          }`}
-                    </p>
-                  ) : (
-                    <>
-                      {/* <h2 className="text-2xl font-bold text-gray-900">
-                        All Tools & Agents
-                      </h2> */}
-                      <p className="text-sm text-gray-600 mt-1">
-                        Showing {filteredCount}{" "}
-                        {filteredCount <= 1 ? "tool" : "tools"}{" "}
-                      </p>
-                    </>
-                  )}
+          <div className="lg:w-64 shrink-0">
+            <div className="bg-white rounded-xl border border-gray-200 p-5 sticky top-24">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <Filter className="w-5 h-5 text-gray-600" />
+                  <h3 className="font-semibold text-gray-900">Filters</h3>
                 </div>
                 {(selectedCategories.length > 0 ||
                   selectedTags.length > 0 ||
                   searchQuery.trim()) && (
-                  <div className="text-sm text-gray-600">
-                    Filters applied:{" "}
-                    {searchQuery.trim() ? "1 search" : "0 searches"},{" "}
-                    {selectedCategories.length} categories,{" "}
-                    {selectedTags.length} tags
-                  </div>
+                  <X
+                    className="w-5 h-5 text-gray-400 hover:text-gray-600 cursor-pointer"
+                    onClick={removeAllFilters}
+                  />
                 )}
               </div>
-              <FeaturedProducts
-                gridCols={2}
-                showRating={false}
-                showAll={true}
-                selectedCategories={selectedCategories}
-                selectedTags={selectedTags}
-                searchQuery={searchQuery}
-                onFilteredCountChange={handleFilteredCountChange}
-                onSearchQueryChange={handleSearchQueryChange}
-              />
+
+              {/* Categories Filter */}
+              <div className="mb-5 pb-5 border-b border-gray-100">
+                <h4 className="font-medium text-gray-700 mb-3 text-sm">Categories</h4>
+                <div className="space-y-2 max-h-48 overflow-y-auto">
+                  {sortedCategories.map((category) => (
+                    <div
+                      key={category.id}
+                      className="flex items-center justify-between py-1"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id={category.slug}
+                          checked={selectedCategories.includes(category.slug)}
+                          onCheckedChange={(checked) =>
+                            handleCategoryChange(category.slug, checked)
+                          }
+                        />
+                        <label htmlFor={category.slug} className="text-sm text-gray-600 cursor-pointer">
+                          {category.name}
+                        </label>
+                      </div>
+                      <span className="text-xs text-gray-400">
+                        {categoryCounts[category.id] || 0}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Tags Filter */}
+              <div className="mb-5">
+                <h4 className="font-medium text-gray-700 mb-3 text-sm">Tags</h4>
+                <div className="space-y-2 max-h-48 overflow-y-auto">
+                  {sortedTags.map((tag) => (
+                    <div key={tag} className="flex items-center space-x-2 py-1">
+                      <Checkbox
+                        id={`tag-${tag}`}
+                        checked={selectedTags.includes(tag)}
+                        onCheckedChange={(checked) =>
+                          handleTagChange(tag, checked)
+                        }
+                      />
+                      <label htmlFor={`tag-${tag}`} className="text-sm text-gray-600 cursor-pointer">
+                        #{tag}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Remove Filters Button */}
+              {(selectedCategories.length > 0 || selectedTags.length > 0) && (
+                <div className="pt-4 border-t border-gray-100">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={removeAllFilters}
+                    className="w-full text-sm"
+                  >
+                    Clear All Filters
+                  </Button>
+                </div>
+              )}
             </div>
+          </div>
+
+          {/* Main Content */}
+          <div className="flex-1">
+            <div className="flex items-center justify-between mb-6">
+              <p className="text-sm text-gray-500">
+                {filteredCount === 0
+                  ? "No tools found"
+                  : `Showing ${filteredCount} ${filteredCount === 1 ? "tool" : "tools"}`}
+              </p>
+              {(selectedCategories.length > 0 ||
+                selectedTags.length > 0 ||
+                searchQuery.trim()) && (
+                <p className="text-xs text-gray-400">
+                  {selectedCategories.length > 0 && `${selectedCategories.length} categories`}
+                  {selectedCategories.length > 0 && selectedTags.length > 0 && ", "}
+                  {selectedTags.length > 0 && `${selectedTags.length} tags`}
+                </p>
+              )}
+            </div>
+            <FeaturedProducts
+              gridCols={3}
+              showRating={false}
+              showAll={true}
+              selectedCategories={selectedCategories}
+              selectedTags={selectedTags}
+              searchQuery={searchQuery}
+              onFilteredCountChange={handleFilteredCountChange}
+              onSearchQueryChange={handleSearchQueryChange}
+            />
           </div>
         </div>
       </div>
