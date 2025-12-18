@@ -30,15 +30,18 @@ const relatedStacks = [
 
 export default async function StackDetailPage({ params }) {
   const { id } = await params;
-  
-  console.log("Stack ID requested:", id);
-  
+
+
   // Fetch stack from DB (by id or slug)
   const { data: stackData, error } = await supabase
     .from("stacks")
     .select(
       `
-      id, name, description,
+      id,
+       name,
+        description,
+         created_by:users(name),
+          created_at,
       product_stacks:product_stack_jnc(
         product:products(
           id, name, slug, tagline, website_url, tool_thumbnail_url, tags,
@@ -54,7 +57,6 @@ export default async function StackDetailPage({ params }) {
     )
     .eq("id", id)
     .single();
-
 
   if (error || !stackData) {
     return (
@@ -109,19 +111,18 @@ export default async function StackDetailPage({ params }) {
 
         {/* Stack Header */}
         <div
-          className={`rounded-lg p-8 mb-8 ${
-            stackData.color === "blue"
-              ? "bg-blue-50 border-blue-200"
-              : stackData.color === "green"
+          className={`rounded-lg p-8 mb-8 ${stackData.color === "blue"
+            ? "bg-blue-50 border-blue-200"
+            : stackData.color === "green"
               ? "bg-green-50 border-green-200"
               : stackData.color === "purple"
-              ? "bg-purple-50 border-purple-200"
-              : stackData.color === "pink"
-              ? "bg-pink-50 border-pink-200"
-              : stackData.color === "yellow"
-              ? "bg-yellow-50 border-yellow-200"
-              : "bg-indigo-50 border-indigo-200"
-          } border-2`}
+                ? "bg-purple-50 border-purple-200"
+                : stackData.color === "pink"
+                  ? "bg-pink-50 border-pink-200"
+                  : stackData.color === "yellow"
+                    ? "bg-yellow-50 border-yellow-200"
+                    : "bg-indigo-50 border-indigo-200"
+            } border-2`}
         >
           <div className="flex items-start gap-6">
             <div
@@ -130,31 +131,48 @@ export default async function StackDetailPage({ params }) {
               {stackData.name?.charAt(0) || "S"}
             </div>
             <div className="flex-1">
-              <h1 className="text-3xl font-bold text-gray-900 mb-3">
+              <h1 className="text-3xl font-bold text-gray-900 mb-3 flex items-baseline gap-3">
                 {stackData.name}
+
+                {stackData.created_by && (
+                  <span className="text-base font-medium text-gray-500">
+                    by {stackData.created_by.name || "Anonymous"}
+                  </span>
+                )}
               </h1>
+
               <p className="text-lg text-gray-700 mb-6">
                 {stackData.description}
               </p>
 
               <div className="flex items-center gap-6 mb-6">
+
                 <div className="flex items-center gap-2">
                   <Zap className="w-5 h-5 text-gray-600" />
                   <span className="text-gray-600">
                     {stackProducts.length} Tools & Agents
                   </span>
                 </div>
+
                 <div className="flex items-center gap-2">
                   <Users className="w-5 h-5 text-gray-600" />
                   <span className="text-gray-600">
                     Perfect for {stackData.name.toLowerCase()}
                   </span>
                 </div>
+
+                {stackData.created_at && (
+                  <div className="flex items-center text-sm text-gray-400">
+                    Created at {new Date(stackData.created_at).toLocaleDateString()}
+                  </div>
+                )}
+
               </div>
 
               <div className="flex gap-3">
                 <StackActions stackId={stackData.id} />
               </div>
+
             </div>
           </div>
         </div>
@@ -188,6 +206,7 @@ export default async function StackDetailPage({ params }) {
             </div>
 
             {/* Why This Stack */}
+            {/*
             <div className="mb-8">
               <h2 className="text-2xl font-bold text-gray-900 mb-4">
                 Why This Stack Works
@@ -231,6 +250,7 @@ export default async function StackDetailPage({ params }) {
                 </div>
               </div>
             </div>
+            */}
           </div>
 
           {/* Right Sidebar */}

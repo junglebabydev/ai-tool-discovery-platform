@@ -36,6 +36,7 @@ export default function StackActions({ stackId }) {
         <Bookmark className={`w-4 h-4 ${saved ? "fill-current" : ""}`} />
         {saved ? "Saved" : "Save"}
       </Button>
+      {/*
       <Button
         variant={liked ? "default" : "outline"}
         className="flex items-center gap-2"
@@ -44,7 +45,7 @@ export default function StackActions({ stackId }) {
         <Heart className={`w-4 h-4 ${liked ? "fill-current" : ""}`} />
         {liked ? "Liked" : "Like"}
       </Button>
-
+        */}
       <ShareModal
         isOpen={showShareModal}
         onClose={() => setShowShareModal(false)}
