@@ -253,7 +253,7 @@ export default function HomePage() {
         `
         )
         .order("created_at", { ascending: false })
-        .limit(3);
+        .limit(4);
 
       if (!error && data) {
         setStacks(data);
@@ -413,10 +413,10 @@ export default function HomePage() {
           <div className="flex justify-between items-center mb-8">
             <div>
               <h2 className="text-2xl font-bold text-gray-900 mb-1">
-                Featured Tools
+                Newly Added Tools
               </h2>
               <p className="text-gray-500">
-                Top AI tools trusted by thousands of builders
+                Discover the latest AI tools recently added to our platform
               </p>
             </div>
             <Link href="/explore" className="flex items-center text-gray-600 hover:text-blue-600 transition-colors font-medium">
@@ -441,13 +441,13 @@ export default function HomePage() {
                 Pre-built collections of AI tools for specific workflows
               </p>
             </div>
-            <Link href="/explore" className="flex items-center text-gray-600 hover:text-blue-600 transition-colors font-medium">
+            <Link href="/stack" className="flex items-center text-gray-600 hover:text-blue-600 transition-colors font-medium">
               View All
               <ArrowRight className="w-4 h-4 ml-1" />
             </Link>
           </div>
 
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {stacks.map((stack) => {
               const products = (stack.product_stacks || [])
                 .map((ps) => ps.product)
@@ -458,7 +458,7 @@ export default function HomePage() {
 
               return (
                 <Link key={stack.id} href={`/stack/${stack.id}`} className="block group">
-                  <Card className="overflow-hidden border border-gray-200 h-full hover:shadow-lg transition-all duration-300 hover:border-blue-200 rounded-2xl">
+                  <Card className="bg-white border border-gray-200 hover:shadow-lg hover:border-blue-200 transition-all duration-300 overflow-hidden flex flex-col rounded-2xl cursor-pointer aspect-square">
                     {/* Header with Tool Logos - Overlapping Style */}
                     <div className="h-36 bg-white flex items-center justify-center px-6 border-b border-gray-100">
                       <div className="flex items-center">
@@ -495,7 +495,6 @@ export default function HomePage() {
                         )}
                       </div>
                     </div>
-                    
                     <CardContent className="p-5 bg-white">
                       <h3 className="font-bold text-lg text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
                         {stack.name}

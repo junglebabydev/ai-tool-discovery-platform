@@ -406,6 +406,7 @@ export default function ToolDetailPage() {
                     >
                       About
                     </TabsTrigger>
+                    {/*
                     <TabsTrigger
                       value="social-feeds"
                       className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent"
@@ -418,6 +419,7 @@ export default function ToolDetailPage() {
                     >
                       Team
                     </TabsTrigger>
+                    */}
                   </TabsList>
 
                   <TabsContent value="about" className="p-6">
@@ -430,11 +432,12 @@ export default function ToolDetailPage() {
                           {product.description || "No description available."}
                         </p>
                       </div>
-
+                       {/*
                       <div>
                         <h3 className="text-xl font-semibold text-gray-900 mb-4">
                           About {product.company?.name || "Unknown Company"}
                         </h3>
+                      
                         <p className="text-gray-700 leading-relaxed mb-6">
                           {product.company?.name || "This company"} has been at
                           the forefront of AI technology, creating innovative
@@ -444,7 +447,8 @@ export default function ToolDetailPage() {
                           do.
                         </p>
                       </div>
-
+                        */}
+                    {/*
                       <div className="grid grid-cols-3 gap-4 mb-4">
                         <div className="flex flex-col items-center text-center p-4 bg-gray-50 rounded-lg">
                           <Globe className="w-8 h-8 text-blue-600 mb-2" />
@@ -488,7 +492,8 @@ export default function ToolDetailPage() {
                           </div>
                         </div>
                       </div>
-
+                      */}
+                      {/*
                       <div className="grid grid-cols-3 gap-4">
                         <div className="flex flex-col items-center text-center p-4 bg-gray-50 rounded-lg">
                           <Users className="w-8 h-8 text-blue-600 mb-2" />
@@ -515,10 +520,11 @@ export default function ToolDetailPage() {
                           </div>
                         </div>
 
-                        {/* Empty div to maintain grid alignment */}
                         <div></div>
                       </div>
+                      */}
                     </div>
+                    
                   </TabsContent>
 
                   <TabsContent value="social-feeds" className="p-6">
