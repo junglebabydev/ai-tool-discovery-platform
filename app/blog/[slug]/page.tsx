@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { use } from "react"
 import Link from "next/link"
 import { Calendar, Clock, ArrowLeft, Twitter, Linkedin, Globe, ExternalLink, Share2, BookOpen } from "lucide-react"
 import { PublicLayout } from "@/components/layout/public-layout"
@@ -11,8 +10,8 @@ import { Separator } from "@/components/ui/separator"
 import { blogService } from "@/lib/blog-service"
 import type { BlogPostWithAuthor } from "@/lib/types/blog"
 
-export default function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = use(params)
+export default function BlogPostPage({ params }: { params: { slug: string } }) {
+  const { slug } = params
   const [post, setPost] = useState<BlogPostWithAuthor | null>(null)
   const [loading, setLoading] = useState(true)
   const [tableOfContents, setTableOfContents] = useState<{ id: string; text: string; level: number }[]>([])
