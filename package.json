@@ -79,7 +79,7 @@
     "openai": "^6.15.0",
     "puppeteer": "^24.22.0",
     "react": "^19",
-    "react-day-picker": "9.8.0",
+    "react-day-picker": "10.0.1",
     "react-dom": "^19",
     "react-hook-form": "^7.54.1",
     "react-resizable-panels": "^2.1.7",
